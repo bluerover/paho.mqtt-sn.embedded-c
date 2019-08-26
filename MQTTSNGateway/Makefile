@@ -89,7 +89,7 @@ LIB :=
 LIBS += $(LIB) -L/usr/local/lib
 LDFLAGS := 
 CXXFLAGS := -Wall -O3 -std=c++11
-LDADD := -lpthread -lssl -lcrypto -lrt
+LDADD := -lpthread -lssl -lcrypto -lrt ./tiny-AES-c/aes.a
 OUTDIR := Build
 
 PROG := $(OUTDIR)/$(PROGNAME)

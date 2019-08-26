@@ -35,6 +35,31 @@ MQTTSNPublishHandler::~MQTTSNPublishHandler()
 
 }
 
+static void decrypt_message_data(uint8_t *buf, int len){
+    // AES128 encryption
+    // int i;
+    uint8_t key[] = { 0x2b, 0x7e, 0x15, 0x16, 0x28, 0xae, 0xd2, 0xa6, 0xab, 0xf7, 0x15, 0x88, 0x09, 0xcf, 0x4f, 0x3c };
+    uint8_t iv[]  = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f };
+    int i;
+
+    struct AES_ctx ctx;
+    AES_init_ctx_iv(&ctx, key, iv);
+    AES_CBC_decrypt_buffer(&ctx, buf, len);
+
+    printf("decrypted buffer: ");
+
+    for(i = 0; i < len; i++){
+    	printf("0x%x ", *(buf+i));
+    }
+    printf("\n");
+    printf("len = %d", len);
+
+    printf("\n");
+
+}
+
+
+
 MQTTGWPacket* MQTTSNPublishHandler::handlePublish(Client* client, MQTTSNPacket* packet)
 {
 	uint8_t dup;
@@ -121,6 +146,18 @@ MQTTGWPacket* MQTTSNPublishHandler::handlePublish(Client* client, MQTTSNPacket* 
 	{
 		client->setWaitedPubTopicId(msgId, topicid.data.id, topicid.type);
 	}
+
+	// 	printf("encrypted buffer:");
+
+// 	for(i = 0; i < payloadlen; i++){
+// 		printf("0x%x ", *(payload+i));
+// 	}
+
+// printf("\n");
+	// decrypt the payload
+	// decrypt_message_data((uint8_t*)payload, payloadlen);
+
+	// printf("\npayload = %s\n", payload);
 
 	pub.payload = (char*)payload;
 	pub.payloadlen = payloadlen;
