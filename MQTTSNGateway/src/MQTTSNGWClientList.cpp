@@ -348,7 +348,7 @@ Client* ClientList::getClient(MQTTSNString* clientId)
 
 Client* ClientList::createClient(SensorNetAddress* addr, MQTTSNString* clientId, int type)
 {
-	return createClient(addr, clientId, false, false, type);
+	return createClient(addr, clientId, false, true, type);
 }
 
 Client* ClientList::createClient(SensorNetAddress* addr, MQTTSNString* clientId, bool unstableLine, bool secure, int type)

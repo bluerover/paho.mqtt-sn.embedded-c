@@ -59,8 +59,8 @@ typedef unsigned int   uint32_t;
 /*=================================
  *    Log controls
  ==================================*/
-//#define DEBUG          // print out log for debug
-//#define DEBUG_NWSTACK  // print out SensorNetwork log
+#define DEBUG          // print out log for debug
+#define DEBUG_NWSTACK  // print out SensorNetwork log
 
 #ifdef  DEBUG
 #define DEBUGLOG(...) printf(__VA_ARGS__)
