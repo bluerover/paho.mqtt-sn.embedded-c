@@ -77,7 +77,7 @@ $(SUBDIR)/MQTTSNUnsubscribeServer.c
 CXX := g++
 CPPFLAGS += 
 
-INCLUDE :=
+INCLUDE := -I ./tiny-AES-c
 INCLUDES += $(INCLUDE) -I$(SRCDIR) \
 -I$(SRCDIR)/$(OS) \
 -I$(SRCDIR)/$(OS)/$(SENSORNET) \

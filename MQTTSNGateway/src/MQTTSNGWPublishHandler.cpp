@@ -22,6 +22,7 @@
 #include "MQTTSNGWClient.h"
 #include "MQTTSNGWQoSm1Proxy.h"
 #include <string.h>
+#include "aes.hpp"
 using namespace std;
 using namespace MQTTSNGW;
 
