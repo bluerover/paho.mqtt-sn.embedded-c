@@ -36,7 +36,20 @@ MQTTSNPublishHandler::~MQTTSNPublishHandler()
 
 }
 
-static void decrypt_message_data(uint8_t *buf, int len){
+static int pkcs7_remove_padding(uint8_t * buf, int len){
+    uint8_t count;
+
+    count = buf[len-1];
+
+    while(count--){
+        buf[len-1] = 0; // replace padding number with 0
+        len--;
+    }
+
+    return len;
+}
+
+static int decrypt_message_data(uint8_t *buf, int len){
     // AES128 encryption
     // int i;
     uint8_t key[] = { 0x2b, 0x7e, 0x15, 0x16, 0x28, 0xae, 0xd2, 0xa6, 0xab, 0xf7, 0x15, 0x88, 0x09, 0xcf, 0x4f, 0x3c };
@@ -47,6 +60,8 @@ static void decrypt_message_data(uint8_t *buf, int len){
     AES_init_ctx_iv(&ctx, key, iv);
     AES_CBC_decrypt_buffer(&ctx, buf, len);
 
+    len = pkcs7_remove_padding(buf, len);
+
     printf("decrypted buffer: ");
 
     for(i = 0; i < len; i++){
@@ -56,6 +71,8 @@ static void decrypt_message_data(uint8_t *buf, int len){
     printf("len = %d", len);
 
     printf("\n");
+
+    return len;
 
 }
 
@@ -156,7 +173,7 @@ MQTTGWPacket* MQTTSNPublishHandler::handlePublish(Client* client, MQTTSNPacket* 
 
 // printf("\n");
 	// decrypt the payload
-	// decrypt_message_data((uint8_t*)payload, payloadlen);
+	payloadlen = decrypt_message_data((uint8_t*)payload, payloadlen);
 
 	// printf("\npayload = %s\n", payload);
 
