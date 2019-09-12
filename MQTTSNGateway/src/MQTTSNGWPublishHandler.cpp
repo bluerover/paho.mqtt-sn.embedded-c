@@ -41,9 +41,16 @@ static int pkcs7_remove_padding(uint8_t * buf, int len){
 
     count = buf[len-1];
 
-    while(count--){
+    if(len<=16 || (count > len)){
+    	return len;
+    }
+
+    printf("removing count = %u from len = %u\n", count, len);
+
+    while(count){
         buf[len-1] = 0; // replace padding number with 0
         len--;
+        count--;
     }
 
     return len;
@@ -60,17 +67,24 @@ static int decrypt_message_data(uint8_t *buf, int len){
     AES_init_ctx_iv(&ctx, key, iv);
     AES_CBC_decrypt_buffer(&ctx, buf, len);
 
-    len = pkcs7_remove_padding(buf, len);
-
-    printf("decrypted buffer: ");
+    printf("\necrypted buffer with padding: ");
 
     for(i = 0; i < len; i++){
     	printf("0x%x ", *(buf+i));
     }
     printf("\n");
-    printf("len = %d", len);
 
+    len = pkcs7_remove_padding(buf, len);
+
+    printf("\ndecrypted buffer without padding: ");
+
+    for(i = 0; i < len; i++){
+    	printf("0x%x ", *(buf+i));
+    }
     printf("\n");
+    // printf("len = %d", len);
+
+    // printf("\n");
 
     return len;
 
@@ -165,15 +179,16 @@ MQTTGWPacket* MQTTSNPublishHandler::handlePublish(Client* client, MQTTSNPacket* 
 		client->setWaitedPubTopicId(msgId, topicid.data.id, topicid.type);
 	}
 
-	// 	printf("encrypted buffer:");
+		printf("encrypted buffer:");
 
-// 	for(i = 0; i < payloadlen; i++){
-// 		printf("0x%x ", *(payload+i));
-// 	}
+	for(int i = 0; i < payloadlen; i++){
+		printf("0x%x ", *(payload+i));
+	}
 
 // printf("\n");
 	// decrypt the payload
-	payloadlen = decrypt_message_data((uint8_t*)payload, payloadlen);
+	if(payloadlen>=16)
+		payloadlen = decrypt_message_data((uint8_t*)payload, payloadlen);
 
 	// printf("\npayload = %s\n", payload);
 
