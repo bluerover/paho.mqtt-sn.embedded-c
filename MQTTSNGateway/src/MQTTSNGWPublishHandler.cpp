@@ -45,7 +45,7 @@ static int pkcs7_remove_padding(uint8_t * buf, int len){
     	return len;
     }
 
-    printf("removing count = %u from len = %u\n", count, len);
+    // printf("removing count = %u from len = %u\n", count, len);
 
     while(count){
         buf[len-1] = 0; // replace padding number with 0
@@ -56,7 +56,7 @@ static int pkcs7_remove_padding(uint8_t * buf, int len){
     return len;
 }
 
-static int decrypt_message_data(uint8_t *buf, int len){
+static int decrypt_pkt_payload(uint8_t *buf, int len){
     // AES128 encryption
     // int i;
     uint8_t key[] = { 0x2b, 0x7e, 0x15, 0x16, 0x28, 0xae, 0xd2, 0xa6, 0xab, 0xf7, 0x15, 0x88, 0x09, 0xcf, 0x4f, 0x3c };
@@ -67,21 +67,21 @@ static int decrypt_message_data(uint8_t *buf, int len){
     AES_init_ctx_iv(&ctx, key, iv);
     AES_CBC_decrypt_buffer(&ctx, buf, len);
 
-    printf("\necrypted buffer with padding: ");
+    // printf("\necrypted buffer with padding: ");
 
-    for(i = 0; i < len; i++){
-    	printf("0x%x ", *(buf+i));
-    }
-    printf("\n");
+    // for(i = 0; i < len; i++){
+    // 	printf("0x%x ", *(buf+i));
+    // }
+    // printf("\n");
 
     len = pkcs7_remove_padding(buf, len);
 
-    printf("\ndecrypted buffer without padding: ");
+    // printf("\ndecrypted buffer without padding: ");
 
-    for(i = 0; i < len; i++){
-    	printf("0x%x ", *(buf+i));
-    }
-    printf("\n");
+    // for(i = 0; i < len; i++){
+    // 	printf("0x%x ", *(buf+i));
+    // }
+    // printf("\n");
     // printf("len = %d", len);
 
     // printf("\n");
@@ -179,16 +179,16 @@ MQTTGWPacket* MQTTSNPublishHandler::handlePublish(Client* client, MQTTSNPacket* 
 		client->setWaitedPubTopicId(msgId, topicid.data.id, topicid.type);
 	}
 
-		printf("encrypted buffer:");
+	// 	printf("encrypted buffer:");
 
-	for(int i = 0; i < payloadlen; i++){
-		printf("0x%x ", *(payload+i));
-	}
+	// for(int i = 0; i < payloadlen; i++){
+	// 	printf("0x%x ", *(payload+i));
+	// }
 
 // printf("\n");
 	// decrypt the payload
 	if(payloadlen>=16)
-		payloadlen = decrypt_message_data((uint8_t*)payload, payloadlen);
+		payloadlen = decrypt_pkt_payload((uint8_t*)payload, payloadlen);
 
 	// printf("\npayload = %s\n", payload);
 

@@ -197,6 +197,7 @@ public:
     void setWaitedSubTopicId(uint16_t msgId, uint16_t topicId, MQTTSN_topicTypes type);
 
     bool checkTimeover(void);
+    bool checkAwsPingTime(void);
     void updateStatus(MQTTSNPacket*);
     void updateStatus(ClientStatus);
     void connectSended(void);
@@ -211,6 +212,7 @@ public:
     Topics* getTopics(void);
     void setTopics(Topics* topics);
     void setKeepAlive(MQTTSNPacket* packet);
+    void setAwsPingTime(uint32_t secs);
 
     SensorNetAddress* getSensorNetAddress(void);
     Network* getNetwork(void);
@@ -254,6 +256,7 @@ public:
     void resetPingRequest(void);
     bool isHoldPringReqest(void);
 
+
     Client* getNextClient(void);
 
 private:
@@ -276,6 +279,7 @@ private:
     bool _holdPingRequest;
 
     Timer _keepAliveTimer;
+    Timer _awsPingReqTimer;
     uint32_t _keepAliveMsec;
 
     ClientStatus _status;

@@ -21,6 +21,7 @@
 
 namespace MQTTSNGW
 {
+	#define AWS_MQTT_MAX_KEEP_ALIVE 1200
 
 class MQTTSNConnectionHandler
 {
@@ -38,7 +39,6 @@ public:
 	void handlePingreq(Client* client, MQTTSNPacket* packet);
 private:
 	void sendStoredPublish(Client* client);
-
 	Gateway* _gateway;
 };
 

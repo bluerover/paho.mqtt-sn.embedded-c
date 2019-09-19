@@ -215,6 +215,7 @@ void MQTTSNConnectionHandler::handleWillmsg(Client* client, MQTTSNPacket* packet
 	}
 }
 
+
 /*
  *  DISCONNECT
  */
@@ -232,6 +233,13 @@ void MQTTSNConnectionHandler::handleDisconnect(Client* client, MQTTSNPacket* pac
             ev->setBrokerSendEvent(client, mqMsg);
             _gateway->getBrokerSendQue()->post(ev);
         }
+
+        // printf("sleep duration = %d\n", duration);
+        if( duration > AWS_MQTT_MAX_KEEP_ALIVE ){
+        	//start ping req timer
+        	client->setAwsPingTime(AWS_MQTT_MAX_KEEP_ALIVE); 
+        }
+
     }
 
     MQTTSNPacket* snMsg = new MQTTSNPacket();
@@ -272,12 +280,15 @@ void MQTTSNConnectionHandler::handleWillmsgupd(Client* client, MQTTSNPacket* pac
  */
 void MQTTSNConnectionHandler::handlePingreq(Client* client, MQTTSNPacket* packet)
 {
+
+	// if there are client msgs stored on GW to send to broker, send those
+	// and hold ping request
 	if ( ( client->isSleep() || client->isAwake() ) &&  client->getClientSleepPacket() )
 	{
 	    sendStoredPublish(client);
 		client->holdPingRequest();
 	}
-	else
+	else 
 	{
         /* send PINGREQ to the broker */
 	    client->resetPingRequest();
