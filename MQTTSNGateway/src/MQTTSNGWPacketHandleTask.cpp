@@ -135,7 +135,7 @@ void PacketHandleTask::run()
 			{
 				client_cnt++;
 				// printf("client->isSleep() = %d, client->checkAwsPingTime = %d\n", client->isSleep(), client->checkAwsPingTime());
-				if (client->isSleep() && client->checkAwsPingTime())
+				if (client->isSleep() && client->checkAwsTimeover())
 				{
 					// printf("awspingtime!\n");
 					// queue ping request to broker

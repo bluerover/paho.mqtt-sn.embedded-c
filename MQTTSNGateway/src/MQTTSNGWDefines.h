@@ -49,6 +49,8 @@ namespace MQTTSNGW
 #define QOSM1_PROXY_KEEPALIVE_DURATION   900       // Secs
 #define QOSM1_PROXY_RESPONSE_DURATION     10       // Secs
 #define QOSM1_PROXY_MAX_RETRY_CNT        3
+
+#define AWS_MQTT_MAX_KEEP_ALIVE (1000)
 /*=================================
  *    Data Type
  ==================================*/

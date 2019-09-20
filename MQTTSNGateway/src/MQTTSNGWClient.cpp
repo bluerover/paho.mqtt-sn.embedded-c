@@ -191,7 +191,7 @@ bool Client::checkTimeover(void)
 	return (_status == Cstat_Active && _keepAliveTimer.isTimeup());
 }
 
-bool Client::checkAwsPingTime(){
+bool Client::checkAwsTimeover(){
 	return _awsPingReqTimer.isTimeup();
 }
 
