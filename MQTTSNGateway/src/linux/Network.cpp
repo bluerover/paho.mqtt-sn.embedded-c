@@ -20,6 +20,7 @@
 #include <openssl/rand.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include <poll.h>
 #include <sys/socket.h>
 #include <regex>
 
@@ -30,7 +31,7 @@
 using namespace std;
 using namespace MQTTSNGW;
 
-#define SOCKET_MAXCONNECTIONS  5
+#define SOCKET_MAXCONNECTIONS  50
 char* currentDateTime();
 
 /*========================================
@@ -416,6 +417,7 @@ bool Network::connect(const char* host, const char* port, const char* caPath, co
 int Network::send(const uint8_t* buf, uint16_t length)
 {
 	char errmsg[256];
+	pollfd pfd;
 	fd_set rset;
 	fd_set wset;
 	bool writeBlockedOnRead = false;
@@ -438,17 +440,24 @@ int Network::send(const uint8_t* buf, uint16_t length)
 
 		while (true)
 		{
-			FD_ZERO(&rset);
-			FD_ZERO(&wset);
-			FD_SET(getSock(), &rset);
-			FD_SET(getSock(), &wset);
 
-			int activity = select(getSock() + 1, &rset, &wset, 0, 0);
+			pfd.fd = getSock();
+			pfd.events = POLLIN | POLLOUT;
+
+			// FD_ZERO(&rset);
+			// FD_ZERO(&wset);
+			// FD_SET(getSock(), &rset);
+			// FD_SET(getSock(), &wset);
+
+			// int activity = select(getSock() + 1, &rset, &wset, 0, 0);
+			
+			int activity = poll(&pfd, 1, 0);
+
 			if (activity > 0)
 			{
-				if (FD_ISSET(getSock(), &wset) || (writeBlockedOnRead  && FD_ISSET(getSock(), &rset)))
+				// if (FD_ISSET(getSock(), &wset) || (writeBlockedOnRead  && FD_ISSET(getSock(), &rset)))
+				if((pfd.revents & POLLOUT) || (writeBlockedOnRead && (pfd.revents & POLLIN)))
 				{
-
 					writeBlockedOnRead = false;
 					int r = SSL_write(_ssl, buf + bpos, length);
 
@@ -490,8 +499,9 @@ int Network::recv(uint8_t* buf, uint16_t len)
 	bool readBlocked = false;
 	int rlen = 0;
 	int bpos = 0;
-	fd_set rset;
-	fd_set wset;
+	pollfd pfd;
+	// fd_set rset;
+	// fd_set wset;
 
 	if (!_secureFlg)
 	{
@@ -543,7 +553,7 @@ loop:
 			break;
 		default:
 			ERR_error_string_n(ERR_get_error(), errmsg, sizeof(errmsg));
-			WRITELOG("Network::recv() %s\n", errmsg);
+			// WRITELOG("Network::recv() %s\n", errmsg);
 			_busy = false;
 			_mutex.unlock();
 			return -1;
@@ -553,16 +563,23 @@ loop:
 	bpos += rlen;
 	while (true)
 	{
-		FD_ZERO(&rset);
-		FD_ZERO(&wset);
-		FD_SET(getSock(), &rset);
-		FD_SET(getSock(), &wset);
 
-		int activity = select(getSock() + 1, &rset, &wset, 0, 0);
+		// FD_ZERO(&rset);
+		// FD_ZERO(&wset);
+		// FD_SET(getSock(), &rset);
+		// FD_SET(getSock(), &wset);
+
+		pfd.fd = getSock();
+		pfd.events = POLLIN | POLLOUT;
+
+		int activity = poll(&pfd, 1, 0);
+		// int activity = select(getSock() + 1, &rset, &wset, 0, 0);
 		if (activity > 0)
 		{
-			if ((FD_ISSET(getSock(),&rset) && !writeBlockedOnRead)
-					|| (readBlockedOnWrite && FD_ISSET(getSock(), &wset)))
+			if(((pfd.revents & POLLIN) && !writeBlockedOnRead) 
+				|| (readBlockedOnWrite && (pfd.revents & POLLOUT)))
+			// if ((FD_ISSET(getSock(),&rset) && !writeBlockedOnRead)
+					// || (readBlockedOnWrite && FD_ISSET(getSock(), &wset)))
 			{
 				goto loop;
 			}

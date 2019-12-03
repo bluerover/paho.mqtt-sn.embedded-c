@@ -18,6 +18,8 @@
 #include "MQTTSNGWClient.h"
 #include "MQTTSNGWClientList.h"
 #include <unistd.h>
+#include <poll.h>
+#include <cstring>
 
 using namespace std;
 using namespace MQTTSNGW;
@@ -56,8 +58,11 @@ void BrokerRecvTask::run(void)
 	MQTTGWPacket* packet = nullptr;
 	int rc;
 	Event* ev = nullptr;
-	fd_set rset;
-	fd_set wset;
+	// fd_set rset;
+	// fd_set wset;
+	pollfd pfd[MAX_CLIENTS];
+
+	memset(pfd, 0, sizeof(pfd));
 
 	while (true)
 	{
@@ -67,10 +72,10 @@ void BrokerRecvTask::run(void)
 			WRITELOG("%s BrokerRecvTask   stopped.\n", currentDateTime());
 			return;
 		}
-		timeout.tv_sec = 0;
-		timeout.tv_usec = 500000;    // 500 msec
-		FD_ZERO(&rset);
-		FD_ZERO(&wset);
+		// timeout.tv_sec = 0;
+		// timeout.tv_usec = 500000;    // 500 msec
+		// FD_ZERO(&rset);
+		// FD_ZERO(&wset);
 		int maxSock = 0;
 		int sockfd = 0;
 
@@ -82,8 +87,11 @@ void BrokerRecvTask::run(void)
 			if (client->getNetwork()->isValid())
 			{
 				sockfd = client->getNetwork()->getSock();
-				FD_SET(sockfd, &rset);
-				FD_SET(sockfd, &wset);
+				// FD_SET(sockfd, &rset);
+				// FD_SET(sockfd, &wset);
+				pfd[sockfd].fd = sockfd;
+				pfd[sockfd].events = POLLIN;
+
 				if (sockfd > maxSock)
 				{
 					maxSock = sockfd;
@@ -99,7 +107,8 @@ void BrokerRecvTask::run(void)
 		else
 		{
 			/* Check sockets is ready to read */
-			int activity = select(maxSock + 1, &rset, 0, 0, &timeout);
+			// int activity = select(maxSock + 1, &rset, 0, 0, &timeout);
+			int activity = poll(pfd, maxSock + 1, 500);
 			if (activity > 0)
 			{
 				client = _gateway->getClientList()->getClient(0);
@@ -110,7 +119,8 @@ void BrokerRecvTask::run(void)
 					if (client->getNetwork()->isValid())
 					{
 						int sockfd = client->getNetwork()->getSock();
-						if (FD_ISSET(sockfd, &rset))
+						//if (FD_ISSET(sockfd, &rset))
+						if (pfd[sockfd].revents & POLLIN)
 						{
 							packet = new MQTTGWPacket();
 							rc = 0;
@@ -146,10 +156,10 @@ void BrokerRecvTask::run(void)
 									}
 									continue;
 								}
-								else if (rc == -1)
-								{
-									WRITELOG("%s BrokerRecvTask can't receive a packet from the broker errno=%d %s%s\n", ERRMSG_HEADER, errno, client->getClientId(), ERRMSG_FOOTER);
-								}
+								// else if (rc == -1)
+								// {
+								// 	WRITELOG("%s BrokerRecvTask can't receive a packet from the broker errno=%d %s%s\n", ERRMSG_HEADER, errno, client->getClientId(), ERRMSG_FOOTER);
+								// }
 								else if ( rc == -2 )
 								{
 									WRITELOG("%s BrokerRecvTask receive invalid length of packet from the broker.  DISCONNECT  %s %s\n", ERRMSG_HEADER, client->getClientId(),ERRMSG_FOOTER);

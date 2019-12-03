@@ -31,7 +31,7 @@ namespace MQTTSNGW
 /*=================================
  *    Parameters
  ==================================*/
-#define MQTTSNGW_MAX_TASK           10  // number of Tasks
+#define MQTTSNGW_MAX_TASK         200  // number of Tasks
 #define PROCESS_LOG_BUFFER_SIZE  16384  // Ring buffer size for Logs
 #define MQTTSNGW_PARAM_MAX         128  // Max length of config records.
 

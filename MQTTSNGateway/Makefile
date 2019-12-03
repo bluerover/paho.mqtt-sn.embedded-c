@@ -88,7 +88,7 @@ DEFS :=
 LIB :=
 LIBS += $(LIB) -L/usr/local/lib
 LDFLAGS := 
-CXXFLAGS := -Wall -O3 -std=c++11
+CXXFLAGS := -Wall -O3 -std=c++11 -ggdb
 LDADD := -lpthread -lssl -lcrypto -lrt ./tiny-AES-c/aes.a
 OUTDIR := Build
 
