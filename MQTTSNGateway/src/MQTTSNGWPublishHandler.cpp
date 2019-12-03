@@ -41,36 +41,49 @@ static int pkcs7_remove_padding(uint8_t * buf, int len){
 
     count = buf[len-1];
 
-    while(count--){
+    if(len<=16 || (count > len)){
+    	return len;
+    }
+
+    // printf("removing count = %u from len = %u\n", count, len);
+
+    while(count){
         buf[len-1] = 0; // replace padding number with 0
         len--;
+        count--;
     }
 
     return len;
 }
 
-static int decrypt_message_data(uint8_t *buf, int len){
+static int decrypt_pkt_payload(uint8_t *buf, int len){
     // AES128 encryption
     // int i;
     uint8_t key[] = { 0x2b, 0x7e, 0x15, 0x16, 0x28, 0xae, 0xd2, 0xa6, 0xab, 0xf7, 0x15, 0x88, 0x09, 0xcf, 0x4f, 0x3c };
     uint8_t iv[]  = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f };
-    int i;
 
     struct AES_ctx ctx;
     AES_init_ctx_iv(&ctx, key, iv);
     AES_CBC_decrypt_buffer(&ctx, buf, len);
 
+    // printf("\necrypted buffer with padding: ");
+
+    // for(i = 0; i < len; i++){
+    // 	printf("0x%x ", *(buf+i));
+    // }
+    // printf("\n");
+
     len = pkcs7_remove_padding(buf, len);
 
-    printf("decrypted buffer: ");
+    // printf("\ndecrypted buffer without padding: ");
 
-    for(i = 0; i < len; i++){
-    	printf("0x%x ", *(buf+i));
-    }
-    printf("\n");
-    printf("len = %d", len);
+    // for(i = 0; i < len; i++){
+    // 	printf("0x%x ", *(buf+i));
+    // }
+    // printf("\n");
+    // printf("len = %d", len);
 
-    printf("\n");
+    // printf("\n");
 
     return len;
 
@@ -167,13 +180,14 @@ MQTTGWPacket* MQTTSNPublishHandler::handlePublish(Client* client, MQTTSNPacket* 
 
 	// 	printf("encrypted buffer:");
 
-// 	for(i = 0; i < payloadlen; i++){
-// 		printf("0x%x ", *(payload+i));
-// 	}
+	// for(int i = 0; i < payloadlen; i++){
+	// 	printf("0x%x ", *(payload+i));
+	// }
 
 // printf("\n");
 	// decrypt the payload
-	payloadlen = decrypt_message_data((uint8_t*)payload, payloadlen);
+	if(payloadlen>=16)
+		payloadlen = decrypt_pkt_payload((uint8_t*)payload, payloadlen);
 
 	// printf("\npayload = %s\n", payload);
 

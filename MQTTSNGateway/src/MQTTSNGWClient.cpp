@@ -191,6 +191,15 @@ bool Client::checkTimeover(void)
 	return (_status == Cstat_Active && _keepAliveTimer.isTimeup());
 }
 
+bool Client::checkAwsTimeover(){
+	return _awsPingReqTimer.isTimeup();
+}
+
+void Client::setAwsPingTime(  uint32_t secs ){
+	_awsPingReqTimer.stop();
+	_awsPingReqTimer.start( secs * 1000UL ); 
+}
+
 void Client::setKeepAlive(MQTTSNPacket* packet)
 {
 	MQTTSNPacket_connectData param;

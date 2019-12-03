@@ -127,6 +127,25 @@ void PacketHandleTask::run()
 				_advertiseTimer.start(_gateway->getGWParams()->keepAlive * 1000UL);
 			}
 
+			// go through all clients and see if any need ping req
+			Client* client = _gateway->getClientList()->getClient(0);
+
+			int client_cnt  = 0;
+			while ( client )
+			{
+				client_cnt++;
+				// printf("client->isSleep() = %d, client->checkAwsPingTime = %d\n", client->isSleep(), client->checkAwsPingTime());
+				if (client->isSleep() && client->checkAwsTimeover())
+				{
+					// printf("awspingtime!\n");
+					// queue ping request to broker
+        			_mqttsnConnection->handlePingreq(client, nullptr);
+        			client->setAwsPingTime(AWS_MQTT_MAX_KEEP_ALIVE);
+				}
+				client = client->getNextClient();
+			}
+			// printf("clients found: %d\n", client_cnt);
+    
 			/*------ Check Adapters   Connect or PINGREQ ------*/
 			adpMgr->checkConnection();
 		}
@@ -158,6 +177,7 @@ void PacketHandleTask::run()
 
 			/* Reset the Timer for PINGREQ. */
 			client->updateStatus(snPacket);
+
 		}
 		/*------  Handle Messages form Broker      ---------*/
 		else if ( ev->getEventType() == EtBrokerRecv )

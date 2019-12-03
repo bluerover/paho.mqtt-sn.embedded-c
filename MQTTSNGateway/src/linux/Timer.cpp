@@ -79,6 +79,9 @@ bool Timer::isTimeup(uint32_t msecs)
 		gettimeofday(&curTime, 0);
 		secs = (curTime.tv_sec - _startTime.tv_sec) * 1000;
 		usecs = (curTime.tv_usec - _startTime.tv_usec) / 1000.0;
+
+		// printf("secs = %ld\n", secs);
+		// printf("msecs = %ld\n", msecs);
 		return ((secs + usecs) > (long) msecs);
 	}
 }

@@ -21,7 +21,7 @@
 
 namespace MQTTSNGW
 {
-
+	
 class MQTTSNConnectionHandler
 {
 public:
@@ -38,7 +38,6 @@ public:
 	void handlePingreq(Client* client, MQTTSNPacket* packet);
 private:
 	void sendStoredPublish(Client* client);
-
 	Gateway* _gateway;
 };
 

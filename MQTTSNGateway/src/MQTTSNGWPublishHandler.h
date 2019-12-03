@@ -32,7 +32,6 @@ public:
 	void handleAck(Client* client, MQTTSNPacket* packet, uint8_t packetType);
 	void handleRegister(Client* client, MQTTSNPacket* packet);
 	void handleRegAck( Client* client, MQTTSNPacket* packet);
-
 	void handleAggregatePublish(Client* client, MQTTSNPacket* packet);
 	void handleAggregateAck(Client* client, MQTTSNPacket* packet, int type);
 

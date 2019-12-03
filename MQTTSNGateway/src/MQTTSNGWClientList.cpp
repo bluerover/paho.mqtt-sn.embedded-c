@@ -15,6 +15,7 @@
  *    Tieto Poland Sp. z o.o. - Gateway improvements
  **************************************************************************************/
 #include "MQTTSNGWClientList.h"
+#include "MQTTSNGWDefines.h"
 #include "MQTTSNGateway.h"
 #include <string.h>
 #include <string>
@@ -354,6 +355,8 @@ Client* ClientList::createClient(SensorNetAddress* addr, MQTTSNString* clientId,
 Client* ClientList::createClient(SensorNetAddress* addr, MQTTSNString* clientId, bool unstableLine, bool secure, int type)
 {
     Client* client = nullptr;
+
+    DEBUGLOG("No. of clients = %d\n", _clientCnt);
 
     /*  anonimous clients */
     if ( _clientCnt > MAX_CLIENTS )
