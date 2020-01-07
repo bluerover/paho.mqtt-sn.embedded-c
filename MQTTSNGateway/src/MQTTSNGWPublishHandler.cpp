@@ -23,6 +23,7 @@
 #include "MQTTSNGWQoSm1Proxy.h"
 #include <string.h>
 #include "aes.hpp"
+#include "crypto.h"
 using namespace std;
 using namespace MQTTSNGW;
 
@@ -59,11 +60,9 @@ static int pkcs7_remove_padding(uint8_t * buf, int len){
 static int decrypt_pkt_payload(uint8_t *buf, int len){
     // AES128 encryption
     // int i;
-    uint8_t key[] = { 0x2b, 0x7e, 0x15, 0x16, 0x28, 0xae, 0xd2, 0xa6, 0xab, 0xf7, 0x15, 0x88, 0x09, 0xcf, 0x4f, 0x3c };
-    uint8_t iv[]  = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f };
 
     struct AES_ctx ctx;
-    AES_init_ctx_iv(&ctx, key, iv);
+    AES_init_ctx_iv(&ctx, CRYPTO_KEYRING, CRYPTO_IV);
     AES_CBC_decrypt_buffer(&ctx, buf, len);
 
     // printf("\necrypted buffer with padding: ");
