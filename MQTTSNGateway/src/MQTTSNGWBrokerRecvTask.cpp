@@ -156,10 +156,10 @@ void BrokerRecvTask::run(void)
 									}
 									continue;
 								}
-								// else if (rc == -1)
-								// {
-								// 	WRITELOG("%s BrokerRecvTask can't receive a packet from the broker errno=%d %s%s\n", ERRMSG_HEADER, errno, client->getClientId(), ERRMSG_FOOTER);
-								// }
+								else if (rc == -1)
+								{
+								 	WRITELOG("%s BrokerRecvTask can't receive a packet from the broker errno=%d %s%s\n", ERRMSG_HEADER, errno, client->getClientId(), ERRMSG_FOOTER);
+								}
 								else if ( rc == -2 )
 								{
 									WRITELOG("%s BrokerRecvTask receive invalid length of packet from the broker.  DISCONNECT  %s %s\n", ERRMSG_HEADER, client->getClientId(),ERRMSG_FOOTER);
@@ -171,8 +171,9 @@ void BrokerRecvTask::run(void)
 
 								delete packet;
 
-								if ( (rc == -1 || rc == -2) && client->isActive() )
+								if ((rc == -1 || rc == -2) && ( client->isActive() || client->isSleep() || client->isAwake() ))
 								{
+									//WRITELOG( "BrokerRecvTask disconnecting the client \n");
 									/* disconnect the client */
 									packet = new MQTTGWPacket();
 									packet->setHeader(DISCONNECT);
