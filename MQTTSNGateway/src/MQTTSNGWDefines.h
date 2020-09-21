@@ -37,7 +37,7 @@ namespace MQTTSNGW
 /*=================================
  *    MQTT-SN Parametrs
  ==================================*/
-#define MAX_CLIENTS                 (6000)  // Number of Clients can be handled.
+#define MAX_CLIENTS                 (100000)  // Number of Clients can be handled.
 #define MAX_CLIENTID_LENGTH          (64)  // Max length of clientID
 #define MAX_INFLIGHTMESSAGES         (10)  // Number of inflight messages
 #define MAX_MESSAGEID_TABLE_SIZE    (500)  // Number of MessageIdTable size
