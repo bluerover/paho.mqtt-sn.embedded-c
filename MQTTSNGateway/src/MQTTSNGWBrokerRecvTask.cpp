@@ -144,6 +144,7 @@ void BrokerRecvTask::run(void)
 							{
 								if ( rc == 0 )  // Disconnected
 								{
+									WRITELOG("BrokerRecvTask cleaning up %s network info\n", client->getClientId());
 									client->getNetwork()->close();
 									delete packet;
 
@@ -158,7 +159,7 @@ void BrokerRecvTask::run(void)
 								}
 								else if (rc == -1)
 								{
-								 	WRITELOG("%s BrokerRecvTask can't receive a packet from the broker errno=%d %s%s\n", ERRMSG_HEADER, errno, client->getClientId(), ERRMSG_FOOTER);
+								 	WRITELOG("%s BrokerRecvTask Broker hung up ssl connection, likely %s exceeded keepalive time. errno=%s %s\n", ERRMSG_HEADER, client->getClientId(), errno, ERRMSG_FOOTER);
 								}
 								else if ( rc == -2 )
 								{
