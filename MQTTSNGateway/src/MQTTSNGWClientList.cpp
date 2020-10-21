@@ -247,7 +247,8 @@ bool ClientList::readPredefinedList(const char* fileName, bool aggregate)
 
 void ClientList::erase(Client*& client)
 {
-    if ( !_authorize && client->erasable())
+    //Check if the list is authorized, and the client is erasable
+    if ( _authorize && client->erasable())
     {
         _mutex.lock();
         Client* prev = client->_prevClient;
