@@ -405,6 +405,7 @@ bool Network::connect(const char* host, const char* port, const char* caPath, co
 		_numOfInstance++;
 		_sslValid = true;
 		rc = true;
+		X509_free(peer);
 	}
 	catch (bool x)
 	{
@@ -513,7 +514,6 @@ int Network::recv(uint8_t* buf, uint16_t len)
 		return 0;
 	}
 	_mutex.lock();
-
 	if ( !_ssl )
 	{
 		_mutex.unlock();
@@ -537,12 +537,8 @@ loop:
 			return rlen + bpos;
 			break;
 		case SSL_ERROR_ZERO_RETURN:
-			SSL_shutdown(_ssl);
-			_ssl = 0;
-			_numOfInstance--;
-			//TCPStack::close();
-			_busy = false;
 			_mutex.unlock();
+			Network::close();
 			return -1;
 			break;
 		case SSL_ERROR_WANT_READ:
@@ -604,6 +600,7 @@ void Network::close(void)
 		{
 			SSL_shutdown(_ssl);
 			SSL_free(_ssl);
+	//		ERR_remove_thread_state(nullptr);
 			_numOfInstance--;
 			_ssl = 0;
 			_sslValid = false;
