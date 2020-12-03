@@ -87,7 +87,7 @@ INCLUDES += $(INCLUDE) -I$(SRCDIR) \
 DEFS :=
 LIB :=
 LIBS += $(LIB) -L/usr/local/lib
-LDFLAGS := 
+LDFLAGS := --disable-linux-futex 
 CXXFLAGS := -Wall -O3 -std=c++11 -ggdb
 LDADD := -lpthread -lssl -lcrypto -lrt ./tiny-AES-c/aes.a
 OUTDIR := Build

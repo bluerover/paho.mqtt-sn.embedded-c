@@ -306,7 +306,7 @@ Client* ClientList::getClient(SensorNetAddress* addr)
 
 Client* ClientList::getClient(int index)
 {
-   _mutex.lock()
+   _mutex.lock();
    Client* client = _firstClient;
    _mutex.unlock();
    int p = 0;
