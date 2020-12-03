@@ -108,22 +108,15 @@ Mutex::~Mutex(void)
 
 void Mutex::lock(void)
 {
+
 	if (_pmutex)
 	{
 		pthread_mutex_lock(_pmutex);
 	}
 	else
 	{
-		try
-		{
-			if (pthread_mutex_lock(&_mutex))
-			{
-				throw;
-			}
-		} catch (char* errmsg)
-		{
-			throw Exception( -1, "The same thread can't aquire a mutex twice.");
-		}
+
+		pthread_mutex_lock(&_mutex);
 	}
 }
 
@@ -136,16 +129,7 @@ void Mutex::unlock(void)
 	}
 	else
 	{
-		try
-		{
-			if (pthread_mutex_unlock(&_mutex))
-			{
-				throw;
-			}
-		} catch (char* errmsg)
-		{
-			throw Exception( -1, "Mutex can't unlock.");
-		}
+		pthread_mutex_unlock(&_mutex);
 	}
 }
 
