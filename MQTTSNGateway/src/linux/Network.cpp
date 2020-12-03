@@ -196,8 +196,9 @@ bool TCPStack::connect(const char* host, const char* service)
 		::close(sockfd);
 		return false;
 	}
-
+	_mutex.lock();
 	_sockfd = sockfd;
+	_mutex.unlock();
 	return true;
 }
 

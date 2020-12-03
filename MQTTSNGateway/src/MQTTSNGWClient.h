@@ -259,6 +259,9 @@ public:
 
     Client* getNextClient(void);
 
+    void lockMutex();
+    void unlockMutex();
+
 private:
     PacketQue<MQTTGWPacket> _clientSleepPacketQue;
     PacketQue<MQTTSNPacket> _proxyPacketQue;
@@ -301,6 +304,8 @@ private:
 
     Client* _nextClient;
     Client* _prevClient;
+
+    Mutex _mutex;
 };
 
 

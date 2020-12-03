@@ -587,6 +587,14 @@ bool Client::isHoldPringReqest(void)
 }
 
 
+void Client::lockMutex(){
+	_mutex.lock();
+}
+
+void Client::unlockMutex(){
+	_mutex.unlock();
+}
+
 
 /*=====================================
  Class WaitREGACKPacket
