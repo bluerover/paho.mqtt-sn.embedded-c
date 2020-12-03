@@ -53,7 +53,10 @@ TCPStack::~TCPStack()
 
 bool TCPStack::isValid()
 {
-	return (_sockfd > 0);
+	_mutex.lock();
+	bool rc  = (_sockfd > 0);
+	_mutex.unlock();
+	return rc;
 }
 
 void TCPStack::close()
@@ -625,21 +628,24 @@ void Network::close(void)
 
 bool Network::isValid()
 {
+	bool rc = false;
+	_mutex.lock();
 	if ( TCPStack::isValid() )
 	{
 		if (_secureFlg)
 		{
 			if (_sslValid && !_busy)
 			{
-				return true;
+				rc =  true;
 			}
 		}
 		else
 		{
-			return true;
+			rc = true;
 		}
-	}
-	return false;
+	} 
+	_mutex.unlock();
+	return rc;
 }
 
 int Network::getSock()
