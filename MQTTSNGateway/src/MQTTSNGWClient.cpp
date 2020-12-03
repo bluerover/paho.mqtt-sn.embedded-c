@@ -88,7 +88,7 @@ Client::~Client()
 		delete _connAck;
 	}
 
-	if (_network)
+	if (_network->isValid())
 	{
 		delete _network;
 	}

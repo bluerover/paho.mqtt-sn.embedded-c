@@ -375,23 +375,29 @@ Event* EventQue::wait(void)
 Event* EventQue::timedwait(uint16_t millsec)
 {
 	Event* ev;
-	if ( _que.size() == 0 )
+	_mutex.lock();
+	int qsize = _que.size();
+	_mutex.unlock();
+
+	if ( qsize == 0 )
 	{
 		_sem.timedwait(millsec);
 	}
 	_mutex.lock();
-
-	if (_que.size() == 0)
+	qsize = _que.size();
+	_mutex.unlock();
+	if (qsize == 0)
 	{
 		ev = new Event();
 		ev->setTimeout();
 	}
 	else
 	{
+		_mutex.lock();
 		ev = _que.front();
 		_que.pop();
+		_mutex.unlock();
 	}
-	_mutex.unlock();
 	return ev;
 }
 

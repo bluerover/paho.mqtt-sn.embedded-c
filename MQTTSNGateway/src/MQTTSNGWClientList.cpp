@@ -306,7 +306,9 @@ Client* ClientList::getClient(SensorNetAddress* addr)
 
 Client* ClientList::getClient(int index)
 {
+   _mutex.lock()
    Client* client = _firstClient;
+   _mutex.unlock();
    int p = 0;
    while ( client != nullptr )
    {
@@ -404,7 +406,7 @@ Client* ClientList::createClient(SensorNetAddress* addr, MQTTSNString* clientId,
     /* add the list */
     if ( _firstClient == nullptr )
     {
-        _firstClient = client;
+        _firstClient = client; // THIS
         _endClient = client;
     }
     else
