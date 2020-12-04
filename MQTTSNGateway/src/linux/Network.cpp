@@ -622,8 +622,8 @@ void Network::close(void)
 			ERR_free_strings();
 		}
 	}
-	TCPStack::close();
 	_mutex.unlock();
+	TCPStack::close();
 }
 
 bool Network::isValid()

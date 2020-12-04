@@ -277,6 +277,7 @@ void ClientList::erase(Client*& client)
         {
             fwd->eraseClient(client);
         }
+        
         delete client;
         client = nullptr;
         _mutex.unlock();

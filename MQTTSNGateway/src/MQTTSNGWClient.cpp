@@ -92,6 +92,7 @@ Client::~Client()
 	{
 		delete _network;
 	}
+	unlockMutex();
 }
 
 TopicIdMapElement* Client::getWaitedPubTopicId(uint16_t msgId)
@@ -445,6 +446,9 @@ WaitREGACKPacketList* Client::getWaitREGACKPacketList()
 
 Client* Client::getNextClient(void)
 {
+	if(_nextClient != nullptr){
+		_nextClient->lockMutex();
+	}
 	return _nextClient;
 }
 

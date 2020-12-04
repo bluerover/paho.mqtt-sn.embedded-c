@@ -81,12 +81,12 @@ void BrokerRecvTask::run(void)
 
 		/* Prepare sockets list to read */
 		Client* client = _gateway->getClientList()->getClient(0);
-
 		while ( client )
 		{
 			if (client->getNetwork()->isValid())
 			{
 				sockfd = client->getNetwork()->getSock();
+				client->unlockMutex();
 				// FD_SET(sockfd, &rset);
 				// FD_SET(sockfd, &wset);
 				pfd[sockfd].fd = sockfd;
@@ -96,10 +96,11 @@ void BrokerRecvTask::run(void)
 				{
 					maxSock = sockfd;
 				}
+			} else { 
+				client->unlockMutex();
 			}
 			client = client->getNextClient();
 		}
-
 		if (maxSock == 0)
 		{
 			usleep(500 * 1000);
@@ -118,7 +119,8 @@ void BrokerRecvTask::run(void)
 					_light->blueLight(false);
 					if (client->getNetwork()->isValid())
 					{
-						int sockfd = client->getNetwork()->getSock();
+						sockfd = client->getNetwork()->getSock();
+						client->unlockMutex();
 						//if (FD_ISSET(sockfd, &rset))
 						if (pfd[sockfd].revents & POLLIN)
 						{
@@ -145,6 +147,7 @@ void BrokerRecvTask::run(void)
 								if ( rc == 0 )  // Disconnected
 								{
 									WRITELOG("BrokerRecvTask cleaning up %s network info\n", client->getClientId());
+									client->lockMutex();
 									client->getNetwork()->close();
 									delete packet;
 
@@ -184,6 +187,8 @@ void BrokerRecvTask::run(void)
 								}
 							}
 						}
+					}else{
+						client->unlockMutex();
 					}
 					nextClient:
 					client = client->getNextClient();
