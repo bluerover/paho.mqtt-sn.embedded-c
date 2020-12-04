@@ -99,7 +99,7 @@ void BrokerRecvTask::run(void)
 			} else { 
 				client->unlockMutex();
 			}
-			client = client->getNextClient();
+			client = client->getNextClient(true);
 		}
 		if (maxSock == 0)
 		{
@@ -153,11 +153,6 @@ void BrokerRecvTask::run(void)
 
 									/* delete client when the client is not authorized & session is clean */
 									_gateway->getClientList()->erase(client);
-
-									if ( client )
-									{
-										client = client->getNextClient();
-									}
 									continue;
 								}
 								else if (rc == -1)
@@ -191,7 +186,7 @@ void BrokerRecvTask::run(void)
 						client->unlockMutex();
 					}
 					nextClient:
-					client = client->getNextClient();
+					client = client->getNextClient(true);
 				}
 			}
 		}

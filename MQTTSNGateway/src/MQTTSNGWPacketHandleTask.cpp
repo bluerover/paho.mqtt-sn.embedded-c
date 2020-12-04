@@ -142,9 +142,7 @@ void PacketHandleTask::run()
         			_mqttsnConnection->handlePingreq(client, nullptr);
         			client->setAwsPingTime(AWS_MQTT_MAX_KEEP_ALIVE);
 				}
-				
-				client = client->getNextClient();
-				client->unlockMutex();
+				client = client->getNextClient(false);	
 			}
 			// printf("clients found: %d\n", client_cnt);
     
