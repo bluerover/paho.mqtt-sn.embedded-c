@@ -444,11 +444,8 @@ WaitREGACKPacketList* Client::getWaitREGACKPacketList()
 	return &_waitREGACKList;
 }
 
-Client* Client::getNextClient(bool lock)
+Client* Client::getNextClient()
 {
-	if(_nextClient != nullptr && lock){
-		_nextClient->lockMutex();
-	}
 	return _nextClient;
 }
 

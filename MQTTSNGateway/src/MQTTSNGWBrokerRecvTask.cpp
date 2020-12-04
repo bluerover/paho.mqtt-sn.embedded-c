@@ -83,10 +83,12 @@ void BrokerRecvTask::run(void)
 		Client* client = _gateway->getClientList()->getClient(0);
 		while ( client )
 		{
+			client->lockMutex();
 			if (client->getNetwork()->isValid())
 			{
 				sockfd = client->getNetwork()->getSock();
 				client->unlockMutex();
+				//TODO: trys to unlock non-locked lock fix pls
 				// FD_SET(sockfd, &rset);
 				// FD_SET(sockfd, &wset);
 				pfd[sockfd].fd = sockfd;
@@ -96,10 +98,13 @@ void BrokerRecvTask::run(void)
 				{
 					maxSock = sockfd;
 				}
-			} else { 
+			}else{
 				client->unlockMutex();
 			}
-			client = client->getNextClient(true);
+			client->lockMutex();
+			Client *tmp = client;
+			client = client->getNextClient();
+			tmp->unlockMutex();
 		}
 		if (maxSock == 0)
 		{
@@ -149,6 +154,7 @@ void BrokerRecvTask::run(void)
 									WRITELOG("BrokerRecvTask cleaning up %s network info\n", client->getClientId());
 									client->lockMutex();
 									client->getNetwork()->close();
+									client->unlockMutex();
 									delete packet;
 
 									/* delete client when the client is not authorized & session is clean */
@@ -182,11 +188,14 @@ void BrokerRecvTask::run(void)
 								}
 							}
 						}
-					}else{
-						client->unlockMutex();
 					}
 					nextClient:
-					client = client->getNextClient(true);
+	
+					client->lockMutex();
+					Client *tmp = client;
+					client = client->getNextClient();
+					//client will be _nextclient or nullptr, still need to unlock prev client lock
+					tmp->unlockMutex();
 				}
 			}
 		}

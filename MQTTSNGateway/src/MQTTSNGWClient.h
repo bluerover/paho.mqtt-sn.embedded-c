@@ -257,7 +257,7 @@ public:
     bool isHoldPringReqest(void);
 
 
-    Client* getNextClient(bool lock);
+    Client* getNextClient();
 
     void lockMutex();
     void unlockMutex();

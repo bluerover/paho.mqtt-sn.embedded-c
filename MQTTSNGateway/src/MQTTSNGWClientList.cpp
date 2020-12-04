@@ -254,7 +254,9 @@ void ClientList::erase(Client*& client)
         Client* prev = client->_prevClient;
         Client* next = client->_nextClient;
         // lock because we are editing the clients, must protect
-        prev->lockMutex();
+        if( prev ){
+            prev->lockMutex();
+        }
         if( next ){
             next->lockMutex();
         }
@@ -284,7 +286,9 @@ void ClientList::erase(Client*& client)
         delete client;
         //If there is another client after we erased this one, we want to return it
         client = next;
-        prev->unlockMutex();
+        if( prev ){
+            prev->lockMutex();
+        }        
         if( next ){
             next->unlockMutex();
         }
