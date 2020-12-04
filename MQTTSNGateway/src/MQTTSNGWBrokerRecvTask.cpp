@@ -121,6 +121,7 @@ void BrokerRecvTask::run(void)
 
 				while ( client )
 				{
+					client->lockMutex();
 					_light->blueLight(false);
 					if (client->getNetwork()->isValid())
 					{
@@ -188,6 +189,8 @@ void BrokerRecvTask::run(void)
 								}
 							}
 						}
+					}else{
+						client->ulockMutex();
 					}
 					nextClient:
 	

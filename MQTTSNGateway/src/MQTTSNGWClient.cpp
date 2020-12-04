@@ -63,6 +63,7 @@ Client::Client(bool secure)
 
 Client::~Client()
 {
+	lockMutex();
 	if ( _topics )
 	{
 		delete _topics;
@@ -301,7 +302,9 @@ void Client::updateStatus(ClientStatus stat)
 
 void Client::connectSended()
 {
+	lockMutex();
 	_status = Cstat_Connecting;
+	unlockMutex();
 }
 
 void Client::connackSended(int rc)
@@ -416,7 +419,10 @@ bool Client::isActive(void)
 
 bool Client::isSleep(void)
 {
-	return (_status == Cstat_Asleep);
+	lockMutex();
+	bool rc = (_status == Cstat_Asleep); 
+	unlockMutex();
+	return rc;
 }
 
 bool Client::isAwake(void)

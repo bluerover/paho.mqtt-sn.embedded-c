@@ -388,6 +388,7 @@ Client* ClientList::createClient(SensorNetAddress* addr, MQTTSNString* clientId,
 
     /* creat a new client */
     client = new Client(secure);
+    client->lockMutex();
     if ( addr )
     {
         client->setClientAddress(addr);
@@ -427,11 +428,13 @@ Client* ClientList::createClient(SensorNetAddress* addr, MQTTSNString* clientId,
         //_endClient specifc mutex needs to be locked here
         _endClient->lockMutex();
         _endClient->_nextClient = client;
-        _endClient->unlockMutex();
         client->_prevClient = _endClient;
         _endClient = client;
+        _endClient->unlockMutex();
+        
     }
     _clientCnt++;
+    client->unlockMutex();
     _mutex.unlock();
     return client;
 }
