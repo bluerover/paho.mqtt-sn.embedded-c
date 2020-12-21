@@ -61,7 +61,11 @@ public:
         T* packet;
         if (_que->size() > 0)
         {
-            _mutex.lock();
+#if DEBUGMUTEX 
+	        _mutex.lock("8\n");
+#else
+	        _mutex.lock();
+#endif
             packet = _que->front();
             _mutex.unlock();
             return packet;
@@ -76,7 +80,11 @@ public:
     post(T* packet)
     {
         int rc;
-        _mutex.lock();
+#if DEBUGMUTEX 
+    	_mutex.lock("9\n");
+#else
+	    _mutex.lock();
+#endif
         rc = _que->post(packet);
         _mutex.unlock();
         return rc;
@@ -86,7 +94,11 @@ public:
     {
         if (_que->size() > 0)
         {
-            _mutex.lock();
+#if DEBUGMUTEX 
+        	_mutex.lock("10\n");
+#else
+	        _mutex.lock();
+#endif
             _que->pop();
             _mutex.unlock();
         }
@@ -94,7 +106,11 @@ public:
 
     void clear()
     {
-        _mutex.lock();
+#if DEBUGMUTEX 
+        _mutex.lock("11\n");
+#else
+	    _mutex.lock();
+#endif
         while (_que->size() > 0)
         {
             delete _que->front();

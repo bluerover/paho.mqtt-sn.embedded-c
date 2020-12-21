@@ -37,7 +37,7 @@ ClientList::ClientList()
 
 ClientList::~ClientList()
 {
-    _mutex.lock();
+    _rwlock.writeLock();
     Client* cl = _firstClient;
     Client* ncl;
 
@@ -47,7 +47,7 @@ ClientList::~ClientList()
         delete cl;
         cl = ncl;
     };
-    _mutex.unlock();
+    _rwlock.rwUnlock();
 }
 
 void ClientList::initialize(bool aggregate)
@@ -247,10 +247,10 @@ bool ClientList::readPredefinedList(const char* fileName, bool aggregate)
 
 void ClientList::erase(Client*& client)
 {
+    _rwlock.writeLock();
     //Check if the list is authorized, and the client is erasable
     if ( _authorize && client->erasable())
     {
-        _mutex.lock();
         Client* prev = client->_prevClient;
         Client* next = client->_nextClient;
 
@@ -279,27 +279,27 @@ void ClientList::erase(Client*& client)
         }
         delete client;
         client = nullptr;
-        _mutex.unlock();
     }
+    _rwlock.rwUnlock();
 }
 
 Client* ClientList::getClient(SensorNetAddress* addr)
 {
     if ( addr )
     {
-        _mutex.lock();
+         _rwlock.readLock();
         Client* client = _firstClient;
 
         while (client != nullptr)
         {
             if (client->getSensorNetAddress()->isMatch(addr) )
             {
-                _mutex.unlock();
+                _rwlock.rwUnlock();
                 return client;
             }
             client = client->_nextClient;
         }
-        _mutex.unlock();
+        _rwlock.rwUnlock();
     }
     return 0;
 }
@@ -326,7 +326,7 @@ Client* ClientList::getClient(int index)
 
 Client* ClientList::getClient(MQTTSNString* clientId)
 {
-    _mutex.lock();
+    _rwlock.readLock();
     Client* client = _firstClient;
     const char* clID =clientId->cstring;
 
@@ -339,12 +339,12 @@ Client* ClientList::getClient(MQTTSNString* clientId)
     {
         if (strncmp((const char*)client->getClientId(), clID, MQTTSNstrlen(*clientId)) == 0 )
         {
-            _mutex.unlock();
+            _rwlock.rwUnlock();
             return client;
         }
         client = client->_nextClient;
     }
-    _mutex.unlock();
+    _rwlock.rwUnlock();
     return 0;
 }
 
@@ -399,7 +399,7 @@ Client* ClientList::createClient(SensorNetAddress* addr, MQTTSNString* clientId,
         client->setQoSm1();
     }
 
-    _mutex.lock();
+    _rwlock.writeLock();
 
     /* add the list */
     if ( _firstClient == nullptr )
@@ -414,7 +414,7 @@ Client* ClientList::createClient(SensorNetAddress* addr, MQTTSNString* clientId,
         _endClient = client;
     }
     _clientCnt++;
-    _mutex.unlock();
+    _rwlock.rwUnlock();
     return client;
 }
 
@@ -449,7 +449,7 @@ Client* ClientList::createPredefinedTopic( MQTTSNString* clientId, string topicN
 			{
 				client->setAggregated();
 			}
-			_mutex.lock();
+            _rwlock.writeLock();
 
 			/* add the list */
 			if ( _firstClient == nullptr )
@@ -464,7 +464,7 @@ Client* ClientList::createPredefinedTopic( MQTTSNString* clientId, string topicN
 				_endClient = client;
 			}
 			_clientCnt++;
-			_mutex.unlock();
+            _rwlock.rwUnlock();
 		}
 
 		// create Topic & Add it

@@ -106,7 +106,31 @@ Mutex::~Mutex(void)
 	}
 }
 
-void Mutex::lock(void)
+#if DEBUGMUTEX
+void Mutex::lock(string toprint);
+{
+	printf(toprint);
+	if (_pmutex)
+	{
+		pthread_mutex_lock(_pmutex);
+	}
+	else
+	{
+		try
+		{
+			if (pthread_mutex_lock(&_mutex))
+			{
+				throw;
+			}
+		} catch (char* errmsg)
+		{
+			throw Exception( -1, "The same thread can't aquire a mutex twice.");
+		}
+	}
+}
+#else
+
+void Mutex::lock()
 {
 	if (_pmutex)
 	{
@@ -126,6 +150,8 @@ void Mutex::lock(void)
 		}
 	}
 }
+
+#endif
 
 void Mutex::unlock(void)
 {
@@ -148,6 +174,34 @@ void Mutex::unlock(void)
 		}
 	}
 }
+
+/*=====================================
+         Class ReaderWriterLock
+  ====================================*/
+
+ReaderWriterLock::ReaderWriterLock(){
+	pthread_rwlockattr_init(&_attr);
+	pthread_rwlockattr_setkind_np(&_attr, PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP);
+	pthread_rwlock_init(&_rwlock, &_attr);
+}
+
+ReaderWriterLock::~ReaderWriterLock(){
+	pthread_rwlock_destroy(&_rwlock);
+	pthread_rwlockattr_destroy(&_attr);
+}
+
+void ReaderWriterLock::readLock(void){
+	pthread_rwlock_rdlock(&_rwlock);
+}
+
+void ReaderWriterLock::rwUnlock(void){
+	pthread_rwlock_unlock(&_rwlock);
+}
+
+void ReaderWriterLock::writeLock(void){
+	pthread_rwlock_wrlock(&_rwlock);
+}
+
 
 /*=====================================
  Class Semaphore

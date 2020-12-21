@@ -16,7 +16,7 @@
 
 #if !defined(MQTT_LOGGING_H)
 #define MQTT_LOGGING_H
-
+#define DEBUGMUTEX 1
 #define STREAM      stdout
 #if !defined(DEBUG)
 #define DEBUG(...)    \

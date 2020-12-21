@@ -37,13 +37,35 @@ public:
 	Mutex();
 	Mutex(const char* name);
 	~Mutex();
-	void lock(void);
+#if DEBUGMUTEX
+	void lock(string toprint);
+
+#else	
+	void lock();
+#endif
 	void unlock(void);
 
 private:
 	pthread_mutex_t _mutex;
 	pthread_mutex_t* _pmutex;
 	int   _shmid;
+};
+
+/*=====================================
+         Class ReaderWriterLock
+  ====================================*/
+class ReaderWriterLock
+{
+public:
+	ReaderWriterLock();
+	~ReaderWriterLock();
+	void readLock(void);
+	void writeLock(void);
+	void rwUnlock(void);
+
+private:
+	pthread_rwlock_t  _rwlock;
+	pthread_rwlockattr_t _attr;
 };
 
 /*=====================================

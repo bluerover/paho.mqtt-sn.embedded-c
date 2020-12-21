@@ -60,6 +60,7 @@ private:
     Client* _firstClient;
     Client* _endClient;
     Mutex _mutex;
+    ReaderWriterLock _rwlock;
     uint16_t _clientCnt;
     bool _authorize {false};
 };
