@@ -273,7 +273,10 @@ public:
     bool isHoldPringReqest(void);
 
 
-    Client* getNextClient(void);
+    Client* getNextClient();
+
+    void lockMutex();
+    void unlockMutex();
 
 private:
     PacketQue<MQTTGWPacket> _clientSleepPacketQue;
@@ -317,6 +320,8 @@ private:
 
     Client* _nextClient;
     Client* _prevClient;
+
+    Mutex _mutex;
 };
 
 

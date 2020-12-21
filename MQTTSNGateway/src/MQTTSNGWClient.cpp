@@ -63,6 +63,7 @@ Client::Client(bool secure)
 
 Client::~Client()
 {
+	lockMutex();
 	if ( _topics )
 	{
 		delete _topics;
@@ -88,10 +89,11 @@ Client::~Client()
 		delete _connAck;
 	}
 
-	if (_network)
+	if (_network->isValid())
 	{
 		delete _network;
 	}
+	unlockMutex();
 }
 
 TopicIdMapElement* Client::getWaitedPubTopicId(uint16_t msgId)
@@ -300,7 +302,9 @@ void Client::updateStatus(ClientStatus stat)
 
 void Client::connectSended()
 {
+	lockMutex();
 	_status = Cstat_Connecting;
+	unlockMutex();
 }
 
 void Client::connackSended(int rc)
@@ -415,7 +419,10 @@ bool Client::isActive(void)
 
 bool Client::isSleep(void)
 {
-	return (_status == Cstat_Asleep);
+	lockMutex();
+	bool rc = (_status == Cstat_Asleep); 
+	unlockMutex();
+	return rc;
 }
 
 bool Client::isAwake(void)
@@ -443,7 +450,7 @@ WaitREGACKPacketList* Client::getWaitREGACKPacketList()
 	return &_waitREGACKList;
 }
 
-Client* Client::getNextClient(void)
+Client* Client::getNextClient()
 {
 	return _nextClient;
 }
@@ -586,6 +593,14 @@ bool Client::isHoldPringReqest(void)
     return _holdPingRequest;
 }
 
+
+void Client::lockMutex(){
+	_mutex.lock();
+}
+
+void Client::unlockMutex(){
+	_mutex.unlock();
+}
 
 
 /*=====================================

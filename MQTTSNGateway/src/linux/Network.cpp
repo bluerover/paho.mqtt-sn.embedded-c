@@ -53,7 +53,10 @@ TCPStack::~TCPStack()
 
 bool TCPStack::isValid()
 {
-	return (_sockfd > 0);
+	_mutex.lock();
+	bool rc  = (_sockfd > 0);
+	_mutex.unlock();
+	return rc;
 }
 
 void TCPStack::close()
@@ -200,8 +203,9 @@ bool TCPStack::connect(const char* host, const char* service)
 		::close(sockfd);
 		return false;
 	}
-
+	_mutex.lock();
 	_sockfd = sockfd;
+	_mutex.unlock();
 	return true;
 }
 
@@ -642,27 +646,30 @@ void Network::close(void)
 			ERR_free_strings();
 		}
 	}
-	TCPStack::close();
 	_mutex.unlock();
+	TCPStack::close();
 }
 
 bool Network::isValid()
 {
+	bool rc = false;
+	_mutex.lock();
 	if ( TCPStack::isValid() )
 	{
 		if (_secureFlg)
 		{
 			if (_sslValid && !_busy)
 			{
-				return true;
+				rc =  true;
 			}
 		}
 		else
 		{
-			return true;
+			rc = true;
 		}
-	}
-	return false;
+	} 
+	_mutex.unlock();
+	return rc;
 }
 
 int Network::getSock()

@@ -253,7 +253,13 @@ void ClientList::erase(Client*& client)
     {
         Client* prev = client->_prevClient;
         Client* next = client->_nextClient;
-
+        // lock because we are editing the clients, must protect
+        if( prev ){
+            prev->lockMutex();
+        }
+        if( next ){
+            next->lockMutex();
+        }
         if (prev)
         {
             prev->_nextClient = next;
@@ -278,7 +284,19 @@ void ClientList::erase(Client*& client)
             fwd->eraseClient(client);
         }
         delete client;
+<<<<<<< HEAD
         client = nullptr;
+=======
+        //If there is another client after we erased this one, we want to return it
+        client = next;
+        if( prev ){
+            prev->lockMutex();
+        }        
+        if( next ){
+            next->unlockMutex();
+        }
+        _mutex.unlock();
+>>>>>>> 761ec8b2346108c35ddf4cc64869ed4cc2b1fdf4
     }
     _rwlock.rwUnlock();
 }
@@ -306,7 +324,9 @@ Client* ClientList::getClient(SensorNetAddress* addr)
 
 Client* ClientList::getClient(int index)
 {
+   _mutex.lock();
    Client* client = _firstClient;
+   _mutex.unlock();
    int p = 0;
    while ( client != nullptr )
    {
@@ -373,6 +393,7 @@ Client* ClientList::createClient(SensorNetAddress* addr, MQTTSNString* clientId,
 
     /* creat a new client */
     client = new Client(secure);
+    client->lockMutex();
     if ( addr )
     {
         client->setClientAddress(addr);
@@ -404,17 +425,26 @@ Client* ClientList::createClient(SensorNetAddress* addr, MQTTSNString* clientId,
     /* add the list */
     if ( _firstClient == nullptr )
     {
-        _firstClient = client;
+        _firstClient = client; // THIS
         _endClient = client;
     }
     else
     {
+        //_endClient specifc mutex needs to be locked here
+        _endClient->lockMutex();
         _endClient->_nextClient = client;
         client->_prevClient = _endClient;
         _endClient = client;
+        _endClient->unlockMutex();
+        
     }
     _clientCnt++;
+<<<<<<< HEAD
     _rwlock.rwUnlock();
+=======
+    client->unlockMutex();
+    _mutex.unlock();
+>>>>>>> 761ec8b2346108c35ddf4cc64869ed4cc2b1fdf4
     return client;
 }
 

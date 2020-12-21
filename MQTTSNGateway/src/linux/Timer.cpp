@@ -29,10 +29,10 @@ using namespace MQTTSNGW;
 /*=====================================
  Print Current Date & Time
  =====================================*/
-char theCurrentTime[32];
 
 const char* currentDateTime()
 {
+	char theCurrentTime[32];
 	struct timeval now;
 	struct tm tstruct;
 	gettimeofday(&now, 0);

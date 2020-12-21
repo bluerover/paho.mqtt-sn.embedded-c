@@ -362,10 +362,13 @@ void  EventQue::setMaxSize(uint16_t maxSize)
 Event* EventQue::wait(void)
 {
 	Event* ev = nullptr;
-
+	int qsize;
 	while(ev == nullptr)
 	{
-		if ( _que.size() == 0 )
+		_mutex.lock();
+		qsize = _que.size();
+		_mutex.unlock();
+		if ( qsize == 0 )
 		{
 			_sem.wait();
 		}
@@ -384,7 +387,11 @@ Event* EventQue::wait(void)
 Event* EventQue::timedwait(uint16_t millsec)
 {
 	Event* ev;
-	if ( _que.size() == 0 )
+	_mutex.lock();
+	int qsize = _que.size();
+	_mutex.unlock();
+
+	if ( qsize == 0 )
 	{
 		_sem.timedwait(millsec);
 	}
@@ -392,18 +399,25 @@ Event* EventQue::timedwait(uint16_t millsec)
 	_mutex.lock("3\n");
 #else
 	_mutex.lock();
+<<<<<<< HEAD
 #endif
 	if (_que.size() == 0)
+=======
+	qsize = _que.size();
+	_mutex.unlock();
+	if (qsize == 0)
+>>>>>>> 761ec8b2346108c35ddf4cc64869ed4cc2b1fdf4
 	{
 		ev = new Event();
 		ev->setTimeout();
 	}
 	else
 	{
+		_mutex.lock();
 		ev = _que.front();
 		_que.pop();
+		_mutex.unlock();
 	}
-	_mutex.unlock();
 	return ev;
 }
 

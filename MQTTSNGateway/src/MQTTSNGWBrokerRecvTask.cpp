@@ -81,12 +81,14 @@ void BrokerRecvTask::run(void)
 
 		/* Prepare sockets list to read */
 		Client* client = _gateway->getClientList()->getClient(0);
-
 		while ( client )
 		{
+			client->lockMutex();
 			if (client->getNetwork()->isValid())
 			{
 				sockfd = client->getNetwork()->getSock();
+				client->unlockMutex();
+				//TODO: trys to unlock non-locked lock fix pls
 				// FD_SET(sockfd, &rset);
 				// FD_SET(sockfd, &wset);
 				pfd[sockfd].fd = sockfd;
@@ -96,10 +98,14 @@ void BrokerRecvTask::run(void)
 				{
 					maxSock = sockfd;
 				}
+			}else{
+				client->unlockMutex();
 			}
+			client->lockMutex();
+			Client *tmp = client;
 			client = client->getNextClient();
+			tmp->unlockMutex();
 		}
-
 		if (maxSock == 0)
 		{
 			usleep(500 * 1000);
@@ -115,10 +121,12 @@ void BrokerRecvTask::run(void)
 
 				while ( client )
 				{
+					client->lockMutex();
 					_light->blueLight(false);
 					if (client->getNetwork()->isValid())
 					{
-						int sockfd = client->getNetwork()->getSock();
+						sockfd = client->getNetwork()->getSock();
+						client->unlockMutex();
 						//if (FD_ISSET(sockfd, &rset))
 						if (pfd[sockfd].revents & POLLIN)
 						{
@@ -145,16 +153,13 @@ void BrokerRecvTask::run(void)
 								if ( rc == 0 )  // Disconnected
 								{
 									WRITELOG("BrokerRecvTask cleaning up %s network info\n", client->getClientId());
+									client->lockMutex();
 									client->getNetwork()->close();
+									client->unlockMutex();
 									delete packet;
 
 									/* delete client when the client is not authorized & session is clean */
 									_gateway->getClientList()->erase(client);
-
-									if ( client )
-									{
-										client = client->getNextClient();
-									}
 									continue;
 								}
 								else if (rc == -1)
@@ -184,9 +189,16 @@ void BrokerRecvTask::run(void)
 								}
 							}
 						}
+					}else{
+						client->ulockMutex();
 					}
 					nextClient:
+	
+					client->lockMutex();
+					Client *tmp = client;
 					client = client->getNextClient();
+					//client will be _nextclient or nullptr, still need to unlock prev client lock
+					tmp->unlockMutex();
 				}
 			}
 		}
