@@ -176,7 +176,11 @@ void Forwarder::addClient(Client* client, WirelessNodeId* id)
 Client* Forwarder::getClient(WirelessNodeId* id)
 {
     Client* cl = nullptr;
-    _mutex.lock();
+#if DEBUGMUTEX 
+    _mutex.lock("12\n");
+#else
+	_mutex.lock();
+#endif
     ForwarderElement* p = _headClient;
     while ( p )
     {
@@ -202,7 +206,11 @@ const char* Forwarder::getName(void)
 WirelessNodeId* Forwarder::getWirelessNodeId(Client* client)
 {
     WirelessNodeId* nodeId = nullptr;
-    _mutex.lock();
+#if DEBUGMUTEX 
+    _mutex.lock("13\n");
+#else
+	_mutex.lock();
+#endif
     ForwarderElement* p = _headClient;
     while ( p )
     {
@@ -223,7 +231,11 @@ WirelessNodeId* Forwarder::getWirelessNodeId(Client* client)
 void Forwarder::eraseClient(Client* client)
 {
     ForwarderElement* prev = nullptr;
-    _mutex.lock();
+#if DEBUGMUTEX 
+    _mutex.lock("14\n");
+#else
+	_mutex.lock();
+#endif
     ForwarderElement* p = _headClient;
 
     while ( p )

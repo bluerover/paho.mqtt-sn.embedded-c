@@ -58,7 +58,11 @@ bool TCPStack::isValid()
 
 void TCPStack::close()
 {
+#if DEBUGMUTEX 
+    _mutex.lock("22\n");
+#else
 	_mutex.lock();
+#endif
 	if (_sockfd > 0)
 	{
 		::close(_sockfd);
@@ -252,7 +256,11 @@ Network::~Network()
 bool Network::connect(const char* host, const char* port)
 {
 	bool rc = false;
+#if DEBUGMUTEX 
+    _mutex.lock("23\n");
+#else
 	_mutex.lock();
+#endif
 	if (_secureFlg)
 	{
 		goto exit;
@@ -277,7 +285,11 @@ bool Network::connect(const char* host, const char* port, const char* caPath, co
 	char peer_CN[256];
 	bool rc;
 
+#if DEBUGMUTEX 
+    _mutex.lock("24\n");
+#else
 	_mutex.lock();
+#endif
 	try
 	{
 		if (!_secureFlg)
@@ -430,7 +442,11 @@ int Network::send(const uint8_t* buf, uint16_t length)
 	}
 	else
 	{
+#if DEBUGMUTEX 
+	    _mutex.lock("25\n");
+#else
 		_mutex.lock();
+#endif
 
 		if ( !_ssl )
 		{
@@ -513,7 +529,11 @@ int Network::recv(uint8_t* buf, uint16_t len)
 	{
 		return 0;
 	}
+#if DEBUGMUTEX 
+    _mutex.lock("26\n");
+#else
 	_mutex.lock();
+#endif
 	if ( !_ssl )
 	{
 		_mutex.unlock();
@@ -593,7 +613,11 @@ loop:
 
 void Network::close(void)
 {
+#if DEBUGMUTEX 
+    _mutex.lock("28\n");
+#else
 	_mutex.lock();
+#endif
 	if (_secureFlg)
 	{
 		if (_ssl)

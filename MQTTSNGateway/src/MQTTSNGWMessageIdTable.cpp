@@ -29,7 +29,11 @@ MessageIdTable::MessageIdTable()
 
 MessageIdTable::~MessageIdTable()
 {
+#if DEBUGMUTEX 
+    _mutex.lock("15\n");
+#else
 	_mutex.lock();
+#endif
 	if ( _head != nullptr )
 	{
 		MessageIdElement* p = _tail;
@@ -57,7 +61,11 @@ MessageIdElement* MessageIdTable::add(Aggregater* aggregater, Client* client, ui
 	{
 		return nullptr;
 	}
+#if DEBUGMUTEX 
+    _mutex.lock("16\n");
+#else
 	_mutex.lock();
+#endif
 	if ( _head == nullptr )
 	{
 		elm->_msgId = aggregater->msgId();
@@ -120,7 +128,11 @@ Client* MessageIdTable::getClientMsgId(uint16_t msgId, uint16_t* clientMsgId)
 {
 	Client* clt = nullptr;
 	*clientMsgId = 0;
+#if DEBUGMUTEX 
+    _mutex.lock("17\n");
+#else
 	_mutex.lock();
+#endif
 	MessageIdElement* p = find(msgId);
 	if ( p != nullptr )
 	{
@@ -134,7 +146,11 @@ Client* MessageIdTable::getClientMsgId(uint16_t msgId, uint16_t* clientMsgId)
 
 void MessageIdTable::erase(uint16_t msgId)
 {
+#if DEBUGMUTEX 
+    _mutex.lock("18\n");
+#else
 	_mutex.lock();
+#endif
 	MessageIdElement* p = find(msgId);
 	clear(p);
 	_mutex.unlock();

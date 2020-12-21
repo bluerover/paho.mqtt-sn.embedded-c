@@ -340,7 +340,12 @@ EventQue::EventQue()
 
 EventQue::~EventQue()
 {
+#if DEBUGMUTEX 
+	_mutex.lock("1\n");
+#else
 	_mutex.lock();
+#endif
+
 	while (_que.size() > 0)
 	{
 		delete _que.front();
@@ -364,7 +369,11 @@ Event* EventQue::wait(void)
 		{
 			_sem.wait();
 		}
+#if DEBUGMUTEX 
+		_mutex.lock("2\n");
+#else
 		_mutex.lock();
+#endif
 		ev = _que.front();
 		_que.pop();
 		_mutex.unlock();
@@ -379,8 +388,11 @@ Event* EventQue::timedwait(uint16_t millsec)
 	{
 		_sem.timedwait(millsec);
 	}
+#if DEBUGMUTEX 
+	_mutex.lock("3\n");
+#else
 	_mutex.lock();
-
+#endif
 	if (_que.size() == 0)
 	{
 		ev = new Event();
@@ -399,7 +411,11 @@ void EventQue::post(Event* ev)
 {
 	if ( ev )
 	{
+#if DEBUGMUTEX 
+		_mutex.lock("4\n");
+#else
 		_mutex.lock();
+#endif		
 		if ( _que.post(ev) )
 		{
 			_sem.post();
@@ -414,7 +430,11 @@ void EventQue::post(Event* ev)
 
 int EventQue::size()
 {
+#if DEBUGMUTEX 
+	_mutex.lock("5\n");
+#else
 	_mutex.lock();
+#endif	
 	int sz = _que.size();
 	_mutex.unlock();
 	return sz;

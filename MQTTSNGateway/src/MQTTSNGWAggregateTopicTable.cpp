@@ -54,7 +54,11 @@ AggregateTopicElement::AggregateTopicElement(Topic* topic, Client* client)
 
 AggregateTopicElement::~AggregateTopicElement(void)
 {
+#if DEBUGMUTEX 
+	_mutex.lock("5\n");
+#else
 	_mutex.lock();
+#endif
 	if ( _head != nullptr )
 	{
 		ClientTopicElement* p = _tail;

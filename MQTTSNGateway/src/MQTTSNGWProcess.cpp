@@ -309,7 +309,11 @@ void MultiTaskProcess::waitStop(void)
 
 void MultiTaskProcess::threadStoped(void)
 {
+#if DEBUGMUTEX 
+    _mutex.lock("19\n");
+#else
 	_mutex.lock();
+#endif
 	_stopCount++;
 	_mutex.unlock();
 
@@ -317,7 +321,11 @@ void MultiTaskProcess::threadStoped(void)
 
 void MultiTaskProcess::attach(Thread* thread)
 {
+#if DEBUGMUTEX 
+    _mutex.lock("20\n");
+#else
 	_mutex.lock();
+#endif
 	if (_threadCount < MQTTSNGW_MAX_TASK)
 	{
 		_threadList[_threadCount] = thread;
@@ -333,7 +341,11 @@ void MultiTaskProcess::attach(Thread* thread)
 
 int MultiTaskProcess::getParam(const char* parameter, char* value)
 {
+#if DEBUGMUTEX 
+    _mutex.lock("21\n");
+#else
 	_mutex.lock();
+#endif
 	int rc = Process::getParam(parameter, value);
 	_mutex.unlock();
 	if (rc == -1)
