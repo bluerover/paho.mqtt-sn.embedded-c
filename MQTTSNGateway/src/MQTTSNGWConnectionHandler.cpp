@@ -75,7 +75,7 @@ void MQTTSNConnectionHandler::handleConnect(Client* client, MQTTSNPacket* packet
 	}
 
 	/* return CONNACK when the client is sleeping */
-	if ( client->isSleep() || client->isAwake() )
+	if ( client->isSleep() || client->isAwake() || client->isActive() )
 	{
 		MQTTSNPacket* packet = new MQTTSNPacket();
 		packet->setCONNACK(MQTTSN_RC_ACCEPTED);

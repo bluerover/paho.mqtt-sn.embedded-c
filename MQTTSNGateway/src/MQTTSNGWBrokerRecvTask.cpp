@@ -174,7 +174,7 @@ void BrokerRecvTask::run(void)
 
 								if ((rc == -1 || rc == -2) && ( client->isActive() || client->isSleep() || client->isAwake() ))
 								{
-									//WRITELOG( "BrokerRecvTask disconnecting the client \n");
+									// WRITELOG( "BrokerRecvTask disconnecting the client \n");
 									/* disconnect the client */
 									packet = new MQTTGWPacket();
 									packet->setHeader(DISCONNECT);
