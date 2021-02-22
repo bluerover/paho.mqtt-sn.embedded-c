@@ -72,6 +72,12 @@ void SensorNetAddress::setAddress(uint32_t IpAddr, uint16_t port)
 	_portNo = port;
 }
 
+void SensorNetAddress::clearAddress(void)
+{
+	_IpAddr = 0;
+	_portNo = 0;
+}
+
 /**
  *  Set Address data to SensorNetAddress
  *

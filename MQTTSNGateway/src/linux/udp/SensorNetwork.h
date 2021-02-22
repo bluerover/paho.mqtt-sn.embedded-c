@@ -40,6 +40,7 @@ public:
 	SensorNetAddress();
 	~SensorNetAddress();
 	void setAddress(uint32_t IpAddr, uint16_t port);
+	void clearAddress(void);
 	int  setAddress(string* data);
 	uint16_t getPortNo(void);
 	uint32_t getIpAddress(void);

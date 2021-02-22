@@ -60,6 +60,9 @@ void ClientSendTask::run()
 			client = ev->getClient();
 			packet = ev->getMQTTSNPacket();
 			rc = adpMgr->unicastToClient(client, packet, this);
+			if(packet->getType() == MQTTSN_DISCONNECT){
+				client->clearClientAddress();
+			}
 		}
 		else if (ev->getEventType() == EtBroadcast)
 		{
@@ -73,6 +76,7 @@ void ClientSendTask::run()
 			log(client, packet);
 			rc = packet->unicast(_sensorNetwork, ev->getSensorNetAddress());
 		}
+
 
 		if ( rc < 0 )
 		{

@@ -217,8 +217,9 @@ public:
     SensorNetAddress* getSensorNetAddress(void);
     Network* getNetwork(void);
     void setClientAddress(SensorNetAddress* sensorNetAddr);
+    void clearClientAddress(void);
     void setSensorNetType(bool stable);
-
+    
     Forwarder* getForwarder(void);
     void setForwarder(Forwarder* forwader);
 

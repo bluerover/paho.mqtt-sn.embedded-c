@@ -373,6 +373,12 @@ void Client::setClientAddress(SensorNetAddress* sensorNetAddr)
 	_sensorNetAddr = *sensorNetAddr;
 }
 
+void Client::clearClientAddress()
+{
+	_sensorNetAddr.clearAddress();
+}
+
+
 SensorNetAddress* Client::getSensorNetAddress(void)
 {
 	return &_sensorNetAddr;
