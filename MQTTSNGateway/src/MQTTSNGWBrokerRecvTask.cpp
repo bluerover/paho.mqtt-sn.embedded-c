@@ -159,7 +159,7 @@ void BrokerRecvTask::run(void)
 								}
 								else if (rc == -1)
 								{
-								 	WRITELOG("%s BrokerRecvTask Broker hung up ssl connection, likely %s exceeded keepalive time. errno=%s %s\n", ERRMSG_HEADER, client->getClientId(), errno, ERRMSG_FOOTER);
+								 	WRITELOG("%s BrokerRecvTask Broker hung up ssl connection, likely %s exceeded keepalive time. errno=%d %s\n", ERRMSG_HEADER, client->getClientId(), errno, ERRMSG_FOOTER);
 								}
 								else if ( rc == -2 )
 								{
