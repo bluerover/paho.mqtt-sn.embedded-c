@@ -147,6 +147,15 @@ void ClientRecvTask::run()
 			}
 		}
 
+		// There should be any existing clients in the client list  with 
+		// the same address of a client that is sending a CONNECT message 
+		// if there is that means that it's address wasn't cleared properly 
+		// on disconnect so we clear the address here 
+		if ( packet->getType() == MQTTSN_CONNECT ){
+			client = _gateway->getClientList()->getClient(senderAddr);
+			client->clearClientAddress();
+		}
+
 		client = _gateway->getClientList()->getClient(senderAddr);
 
 		if ( client )
