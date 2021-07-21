@@ -153,7 +153,8 @@ void ClientRecvTask::run()
 		// on disconnect so we clear the address here 
 		if ( packet->getType() == MQTTSN_CONNECT ){
 			client = _gateway->getClientList()->getClient(senderAddr);
-			client->clearClientAddress();
+			if( client )
+				client->clearClientAddress();
 		}
 
 		client = _gateway->getClientList()->getClient(senderAddr);
